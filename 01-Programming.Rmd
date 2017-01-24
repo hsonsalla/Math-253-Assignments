@@ -60,5 +60,5 @@ The variable task5pi estimates the fraction pi/4 from a "Monte Carlo" simulation
 ## Test statements
 
 ```{r}
-#scoreActivity::score253(1)
+scoreActivity::score253(1)
 ```
