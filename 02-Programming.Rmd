@@ -1,8 +1,51 @@
 # In-Class Programming Activity, Day 2
 
-Your work goes here ...
+### *Hannah Sonsalla*
 
+## Task 1
 
+I created an object called auto_file_name that contains the full path name to the Auto.data file on my system.
+```{r}
+#download.file("http://www-bcf.usc.edu/~gareth/ISL/Auto.csv", destfile="Auto.csv")
+
+auto_file_name <- "/home/local/MAC/hsonsall/Math-253-Assignment/Auto.csv"
+```
+
+## Task 2
+
+I created an object called Auto using the read.csv().
+```{r}
+Auto <- read.csv(auto_file_name)
+```
+
+## Task 3
+
+I created an object task3 that holds a summary of the horsepower variable.
+```{r}
+task3 <- summary(Auto$horsepower)
+```
+
+## Task 4
+
+I installed the ISLR package.
+```{r}
+library(ISLR)
+```
+
+## Task 5
+I used indexing operations described to create the following objects:
+
+task5top - the subset of Auto consisting of the first 5 rows in the first 3 columns.
+task5bottom - the subset of Auto consisting of the last 5 rows in the last 3 columns.
+
+I made an object called task5rowcolumn to hold the number of rows and columns of the Auto data.
+
+```{r}
+task5top <- Auto[1:5, 1:3]
+task5rowcolumn <- dim(Auto)
+task5rowcolumn
+task5bottom <- Auto[393:397, 7:9]
+```
 
 ## Test statements
 
