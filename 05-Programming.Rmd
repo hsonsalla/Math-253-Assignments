@@ -1,7 +1,24 @@
 # In-Class Programming Activity, Day 5
 
-Your work goes here ...
+### Hannah Sonsalla
 
+## Task 1
+```{r}
+library(mosaic)
+galtonData <- mosaicData::Galton
+nbins <- 10
+```
+
+## Task 2
+```{r}
+evenly_spaced <- seq(min(galtonData$height), max(galtonData$height), length.out = nbins + 1)
+evenly_spaced
+```
+
+## Task 3
+```{r}
+bin_counts <- table(cut(galtonData$height, evenly_spaced))
+```
 
 
 ## Test statements
