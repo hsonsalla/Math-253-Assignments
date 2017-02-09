@@ -18,13 +18,13 @@ y2 <- c(0,100,100,0,0)
 lines(x2,y2, lwd = 3, col = "orchid")
 
 #Task 3
-angles <- seq(0, 2 * pi, 0.1)
-x3 <- cos(angles) * 40 + 50 
-y3 <- sin(angles) * 40 + 60
+angles <- seq(0, 2 * pi, 0.01)
+x3 <- cos(angles) * 20 + 50 
+y3 <- sin(angles) * 20 + 60
 polygon(x3, y3, col = "tomato")
 
 # Task 4
-angles <- seq(0, 2 * pi, 0.1)
+angles <- seq(0, 2 * pi, 0.05)
 x4 <- cos(angles) * abs(sin(angles)) * 20 + 30 
 y4 <- sin(angles) * abs(sin(angles)) * 20 + 30
 polygon(x4, y4, col = "aquamarine")
@@ -33,10 +33,6 @@ polygon(x4, y4, col = "aquamarine")
 # Added fill colors for various shapes.  Increased line width of box to 2.  Changed x and y labels on plot.  Supressed the x axis tick marks.
 points(70, 80, pch = 8, col = "cadetblue", lwd = 4)
 ```
-
-## Task 2
-
-
 
 ## Test statements
 
