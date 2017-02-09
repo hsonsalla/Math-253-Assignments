@@ -33,14 +33,16 @@ summary(Yield_mod1)
 ```{r}
 Y_train <- Train_data[['Yield']]
 fhat_train <- predict(Yield_mod1, newdata = Train_data)
-MSE_train <- (Y_train - fhat_train)^2
+MSE_train <- mean((Y_train - fhat_train)^2)
+MSE_train
 ```
 
 ## Task 6
 ```{r}
 Y_test <- Test_data[['Yield']]
 fhat_test <- predict(Yield_mod1, newdata = Test_data)
-MSE_test <- (Y_test - fhat_test)^2
+MSE_test <- mean((Y_test - fhat_test)^2)
+MSE_test
 ```
 
 ## Test statements

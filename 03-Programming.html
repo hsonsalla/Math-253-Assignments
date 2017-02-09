@@ -151,32 +151,36 @@ summary(Yield_mod1)</code></pre>
 ## 
 ## Residuals:
 ##      Min       1Q   Median       3Q      Max 
-## -0.35023 -0.06377 -0.00762  0.06035  0.37434 
+## -0.30837 -0.07485 -0.01428  0.05704  0.64270 
 ## 
 ## Coefficients:
 ##               Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept)  5.863e-01  2.162e-02  27.120  &lt; 2e-16 ***
-## Top10perc    9.346e-04  6.748e-04   1.385    0.168    
-## Outstate    -2.344e-05  2.856e-06  -8.206 2.99e-14 ***
-## Expend       4.425e-06  3.156e-06   1.402    0.162    
+## (Intercept)  5.854e-01  2.386e-02  24.536  &lt; 2e-16 ***
+## Top10perc    1.148e-03  7.158e-04   1.604    0.110    
+## Outstate    -1.952e-05  2.884e-06  -6.768 1.48e-10 ***
+## Expend      -2.011e-07  2.183e-06  -0.092    0.927    
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
-## Residual standard error: 0.1109 on 196 degrees of freedom
-## Multiple R-squared:  0.3226, Adjusted R-squared:  0.3123 
-## F-statistic: 31.12 on 3 and 196 DF,  p-value: &lt; 2.2e-16</code></pre>
+## Residual standard error: 0.1194 on 196 degrees of freedom
+## Multiple R-squared:  0.253,  Adjusted R-squared:  0.2416 
+## F-statistic: 22.13 on 3 and 196 DF,  p-value: 2.206e-12</code></pre>
 </div>
 <div id="task-5" class="section level2">
 <h2>Task 5</h2>
 <pre class="r"><code>Y_train &lt;- Train_data[['Yield']]
 fhat_train &lt;- predict(Yield_mod1, newdata = Train_data)
-MSE_train &lt;- (Y_train - fhat_train)^2</code></pre>
+MSE_train &lt;- mean((Y_train - fhat_train)^2)
+MSE_train</code></pre>
+<pre><code>## [1] 0.01396963</code></pre>
 </div>
 <div id="task-6" class="section level2">
 <h2>Task 6</h2>
 <pre class="r"><code>Y_test &lt;- Test_data[['Yield']]
 fhat_test &lt;- predict(Yield_mod1, newdata = Test_data)
-MSE_test &lt;- (Y_test - fhat_test)^2</code></pre>
+MSE_test &lt;- mean((Y_test - fhat_test)^2)
+MSE_test</code></pre>
+<pre><code>## [1] 0.01383535</code></pre>
 </div>
 <div id="test-statements" class="section level2">
 <h2>Test statements</h2>
@@ -185,8 +189,6 @@ MSE_test &lt;- (Y_test - fhat_test)^2</code></pre>
 ## Running test statements for day  03</code></pre>
 <pre><code>## Loading required package: scoreActivity</code></pre>
 <pre><code>## Loading required package: lazyeval</code></pre>
-<pre><code>## Warning in if (match == expr) wins &lt;- TRUE: the condition has length &gt; 1
-## and only the first element will be used</code></pre>
 <pre><code>## passed: &quot;package:ISLR&quot; %in% search()
 ## passed: &quot;Yield&quot; %in% names(College)
 ## passed: object &quot;test_indices&quot; exists
