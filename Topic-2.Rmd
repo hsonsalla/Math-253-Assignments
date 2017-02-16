@@ -324,6 +324,6 @@ b)  We do not have enough information to tell.  The RSS depends on the test data
 
 c) The cubic regression would have lower train RSS than the linear regression.  Cubic regression has higher flexibility as it follows the data points more closely, and in turn will reduce train RSS.  No matter the true relationship between X and Y, cubic regression will follow the data more closely.
 
-d)  Once again, there is not really enough information to determine whether test RSS for linear regression or cubic regression would be lower.  We do not actually know how far the relationship between X and Y is from linear.  If the relationship is closer to linear than cubic, the linear regression test RSS might be lower than the cubic regression RSS.  On the other hand, if the relationship is closer to cubic than linear, the cubic regression test RSS might be lower than the linear regression RSS.  We do not know what level of fleibility would fit the data the best.  
+d)  Once again, there is not really enough information to determine whether test RSS for linear regression or cubic regression would be lower.  We do not actually know how far the relationship between X and Y is from linear.  If the relationship is closer to linear than cubic, the linear regression test RSS might be lower than the cubic regression RSS.  On the other hand, if the relationship is closer to cubic than linear, the cubic regression test RSS might be lower than the linear regression RSS.  We do not know what level of flexibility would fit the data the best.  
 
 
