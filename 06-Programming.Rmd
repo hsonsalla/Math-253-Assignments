@@ -1,8 +1,68 @@
 # In-Class Programming Activity, Day 6
 
-Your work goes here ...
+## *Hannah Sonsalla*
 
 
+## Task 1
+myHistogram() function
+
+```{r}
+
+library(mosaic)
+data("Galton")
+
+
+myHistogram <- function(v, fill, nbins){
+
+evenly_spaced <- seq(min(v), max(v), length.out = nbins + 1)
+
+bin_counts <- table(cut(v, evenly_spaced))
+
+hist_basics <- data.frame("xL" = evenly_spaced[1:nbins], "xR" = evenly_spaced[2:(nbins+1)], "count" = as.numeric(bin_counts))
+
+My_bars <- data.frame(one_to_five(hist_basics))
+
+plot(My_bars, type = "n", xlab = "Height", ylab = "Count", main = "Height Histogram")
+
+lines(My_bars)
+
+polygon(My_bars, col = fill)
+
+mean = mean(Galton$height)
+standard_deviation = sd(Galton$height)
+normal_density = dnorm(Galton$height, mean = mean, sd = standard_deviation)
+
+points(normal_density)
+
+return(bin_counts)
+}
+
+ # ==================
+
+make_one_bar <- function(point) {
+  xLeft <- point$xL
+  xRight <- point$xR
+  height <- point$count
+  res <- data.frame(
+    x = c(xLeft, xLeft, xRight, xRight, NA),
+    y = c(0, height, height, 0, NA)
+  )
+  res
+}
+# ==================
+one_to_five <- function(hist_data) {
+  bars <- NULL
+  for (k in 1:nrow(hist_data)){
+    new_bar <- make_one_bar(hist_data[k,])
+    bars <- rbind(bars, new_bar)
+  }
+  bars
+}
+
+myHistogram(Galton$height, "tomato", 10)
+myHistogram(Galton$height, "seashell", 2)
+```
+## Task 2
 
 ## Test statements
 
