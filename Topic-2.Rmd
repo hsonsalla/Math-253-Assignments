@@ -1,2 +1,329 @@
 # Topic 2 Exercises: Linear Regression
 
+### Hannah Sonsalla
+
+## Computing Assignment
+### Section 3.6 - Lab: Linear Regression
+```{r}
+library(MASS)
+library(ISLR)
+```
+
+3.6.2 Simple Linear Regression
+
+Initial Exploration
+```{r}
+#fix(Boston) - Line from book doesn't work
+head(Boston)
+names(Boston)
+```
+
+Fit simple linear regression with medv as response and lstat as predictor.  Obtain basic information about model.
+```{r}
+lm.fit=lm(medv~lstat, data = Boston)
+lm.fit
+summary(lm.fit)
+```
+
+Find out what other information is stored in lm.fit.   
+```{r}
+names(lm.fit)
+coef(lm.fit)
+```
+
+Confidence interval for coeficient estimates.
+```{r}
+confint(lm.fit)
+```
+
+Produce confidence intervals and prediction intervals for prediction of medv for a given value of lstat.
+```{r}
+predict(lm.fit, data.frame(lstat=c(5,10,15)), interval="confidence")
+predict(lm.fit, data.frame(lstat=c(5,10,15)), interval="prediction")
+```
+
+Plot medv and lstat along with least squares regression line using plot() and abline() functions.
+```{r}
+plot(Boston$lstat, Boston$medv, xlab ="Percent of Households with Low Socioeconmic Status", ylab = "Median House Value")
+abline(lm.fit)
+```
+
+Experiment with additional settings for plotting lines and points.
+```{r}
+plot(Boston$lstat, Boston$medv, xlab ="Percent of Households with Low Socioeconmic Status", ylab = "Median House Value")
+abline(lm.fit, lwd=3)
+abline(lm.fit, lwd=3, col="red")
+par(mfrow=c(2,2))
+plot(Boston$lstat, Boston$medv, col="red")
+plot(Boston$lstat, Boston$medv, pch=20)
+plot(Boston$lstat, Boston$medv, pch="+")
+plot(Boston$lstat, Boston$medv, pch=1:20)
+```
+
+Examine diagnostic plots.
+```{r}
+par(mfrow=c(2,2))
+plot(lm.fit)
+```
+
+Compute residuals from linear regression.
+```{r}
+plot(predict(lm.fit), residuals(lm.fit))
+plot(predict(lm.fit), rstudent(lm.fit))
+```
+
+Leverage statistics:
+```{r}
+plot(hatvalues(lm.fit))
+which.max(hatvalues(lm.fit))
+```
+
+3.6.3 Multiple Linear Regression
+```{r}
+lm.fit=lm(medv~lstat+age,data=Boston)
+summary(lm.fit)
+```
+
+Perform regression:
+```{r}
+lm.fit=lm(medv~.,data=Boston)
+summary(lm.fit)
+```
+Getting R-squared and RSE.
+```{r}
+summary(lm.fit)$r.sq
+summary(lm.fit)$sigma
+```
+
+Variance Inflation Factors
+```{r}
+library(car)
+vif(lm.fit)
+```
+
+Perform regression excluding age predictor.
+```{r}
+lm.fit1=lm(medv~.-age,data=Boston)
+summary(lm.fit1)
+```
+
+3.6.4 Interaction Terms
+```{r}
+summary(lm(medv~lstat*age,data=Boston))
+```
+
+3.6.5 Non-linear Transformations of Predictors
+
+Perform regression of medv onto lstat and lstat squared.
+```{r}
+lm.fit2=lm(medv~lstat+I(lstat^2), data=Boston)
+summary(lm.fit2)
+```
+
+Use anova() function to further quantify extent to which quadratic fit is superior to linear fit.
+```{r}
+lm.fit=lm(medv~lstat,data=Boston)
+anova(lm.fit, lm.fit2)
+par(mfrow=c(2,2))
+plot(lm.fit2)
+```
+
+Fifth order polynomial
+```{r}
+lm.fit5=lm(medv~poly(lstat,5),data=Boston)
+summary(lm.fit5)
+```
+
+3.6.6 Qualitative Predictors
+
+Examine Carseats data.
+```{r}
+head(Carseats)
+#fix(Carseats)
+names(Carseats)
+```
+
+Fit multiple linear regression model that includes some interactive terms.
+```{r}
+lm.fit=lm(Sales~.+Income:Advertising+Price:Age,data=Carseats)
+summary(lm.fit)
+```
+
+Return coding R uses for dummy variables using contrasts()function.
+```{r}
+contrasts(Carseats$ShelveLoc)
+```
+
+3.6.7 Writing Functions
+
+Function load libraries
+```{r}
+LoadLibraries=function(){
+  library(ISLR)
+  library(MASS)
+  print("The libraries have been loaded.")
+}
+
+LoadLibraries()
+```
+
+
+### ISL 3.7.13
+```{r}
+set.seed(1)
+```
+
+a)
+```{r}
+x=rnorm(100, sd=sqrt(1))
+```
+
+b)
+```{r}
+eps=rnorm(100,sd=sqrt(0.25))
+```
+
+c)
+```{r}
+y = -1 + 0.5*x + eps
+length(y)
+```
+
+Vector y has length 100.  The value of the intercept is -1 and the value of the slope is 0.5.
+
+d) Scatterplot displaying relationship between x and y.
+```{r}
+plot(x,y)
+```
+
+The relationship between "x" and "y" looks linear.  There appears to be some noise (data spread out) due to the "eps" variable.
+
+e) Least squares linear model to predict y using x
+```{r}
+fityx = lm(y~x)
+summary(fityx)
+```
+
+The p-value from the F-statistic is p-value: 4.583e-15 which is close to 0.  Thus, we reject the null hypothesis and can infer that there is an association between X and Y.  We declare that a relationship exists between X and Y.
+
+The prediction for the intercept is -1.01885 and the prediction for the slope is 0.49947.  These are very close to the values for intercept and slope in the original model.  
+
+f)
+Display least squares line on scatterplot.  Draw population regression line on plot.  Make legend.
+
+Least squares line is lime green and population regression line is magenta.
+```{r}
+plot(x,y)
+abline(fityx, col="limegreen", pch = 3)
+abline(-1, 0.5, col = "magenta", pch = 2)
+legend("topleft", c("Least Square", "Regression"), col = c("limegreen", "magenta"), lty = c(1,1))
+```
+
+g) Fit polynomial regression model that predicts y using x and x squared.  Does quadratic term improve the model fit?
+```{r}
+fityx2 = lm(y~x + I(x^2))
+summary(fityx2)
+```
+
+The p-value for the coefficient of x squared is 0.164.  This value is higher than the generally accepted significance level of 0.05, so therefore there is not enough evidence that the quadradic term improves the model fit.
+
+h) Less Noise
+```{r}
+set.seed(1)
+eps <- rnorm(100, sd = 0.25)
+x <- rnorm(100)
+y <- -1 + 0.5 * x + eps
+fityx3 <- lm(y ~ x)
+summary(fityx3)
+```
+
+```{r}
+plot(x,y, main = "Less Noise")
+abline(fityx3, col="limegreen", pch = 3)
+abline(-1, 0.5, col = "magenta", pch = 2)
+legend("topleft", c("Least square", "Regression"), col = c("limegreen", "magenta"), lty = c(1,1))
+```
+
+I reduced the noise by decreasing the variance of the normal distribution used to generate the error term. The coefficients might be very close to the previous ones, but as the relationship is nearly linear, r-squared will be greater and RSE will decrease. The two lines are overlapping.  This can be explained as there is very little noise.
+
+
+i) More Noise
+```{r}
+set.seed(1)
+eps <- rnorm(100, sd = 0.75)
+x <- rnorm(100)
+y <- -1 + 0.5 * x + eps
+fityx4 <- lm(y ~ x)
+summary(fityx4)
+```
+
+```{r}
+plot(x,y, main = "More Noise")
+abline(fityx4, col="limegreen", pch = 3)
+abline(-1, 0.5, col = "magenta", pch = 2)
+legend("topleft", c("Least square", "Regression"), col = c("limegreen", "magenta"), lty = c(1,1))
+```
+
+I increased the noise by increasing the variance of the normal distribution used to generate the error term. The coefficients might be very close to the previous ones, but as the relationship is not linear, r-squared will be lower and RSE will increase. Now the two lines are wider apart, there is room between them.  However, there are still pretty close as the data set is big.
+
+j) Confidence Intervals
+```{r}
+confint(fityx)
+confint(fityx3)
+confint(fityx4)
+```
+
+All of the intervals appear to be centered near 0.5.  Additionally, as noise decreases the confidence intervals become more narrow and predictable.  With more noise, there is a widening of the confidence intervals.  
+
+## Theory Assignment
+
+### Reading Question 1, pg. 66 "This is clearly not true in Fig. 3.1" Explain why.
+This question relates to computing the standard errors associated with estimated intercept and estimated slope.  The book states that in order for the formulas for these computations to be valid, we must assume that the errors for each observation are uncorrelated with common variance.  Figure 3.1 shows that as TV increases, the error tends to increase.  Stated differently, as TV increases, the residual (difference between the ith observed response value and the ith response value) increases.  Thus, the errors in this case are not uncorrelated.  We want randomly distributed errors to use the computations.
+
+### Reading Question 2, pg. 77 "In this case we cannot even fit the multiple regression models using least squares..." Explain why.
+
+When we have a greater number of predictors compared to sample size (p > n), we are unable to obtain a unique regression model.  When using least squares, we would get different estimates for regression coefficients resulting in multiple linear regression equations similar to a system of equations.  Thus, we are unable to fit the multiple linear regression model and the F-statistic cannot be used.  Using the F-statistic only works when p is relatively small compared to n.  
+
+### ISL 3.7.3
+I can write the least squares line as follows:
+
+y-hat = 50 + 20GPA + 0.07IQ + 35Gender + (0.01 x GPA x IQ) - (10 x GPA x Gender)
+
+Females: y-hat = 85 + 10GPA + 0.07IQ  + (0.01 x GPA x IQ)
+
+Males: y-hat = 50 + 20GPA + 0.07IQ  + (0.01 x GPA x IQ)
+
+
+a)
+Answer number iii is correct.  If IQ and GPA are fixed, then the least squares line equations can be reduced to the following:
+
+Females: y-hat = 85 + 10GPA 
+
+Males: y-hat = 50 + 20GPA
+
+The starting salary after graduation for males is higher than for females if:
+
+50 + 20GPA >= 85 + 10GPA 
+
+GPA is greater than or equal to 3.5
+
+Thus, males earn more on average than females provided that GPA is high enough (at least 3.5).
+
+b)  I can merely plug in the given values for IQ (110) and GPA (4.0) into the least square line for females I wrote above.
+
+Females: y-hat = 85 + 10(4.0) + 0.07(110)  + (0.01 x 4.0 x 110) = 137.1
+
+The salary of a female with IQ of 110 and GPA of 4.0 is predicted to be $137,100.
+
+c)  False.  In order to show that GPA/IQ interaction has an impact, we would need to test the hypothesis and look at the p-value associated with the t-statistic or the F-statistic to form a decision.
+
+### ISL 3.7.4
+a) RSS is a measure of the discrepancy between the data and an estimation model.  Seeing as there is not much information provided about the training data, it is hard to know which RSS would be lower than the other or if they would be the same.  I do know that the true relationship between X and Y is linear.  Due to this, I might expect the least squares line to be relatively close to the true regression line.  Therefore, the RSS for the linear regression might be lower than for the cubic regression. 
+
+b)  We do not have enough information to tell.  The RSS depends on the test data.  We can infer that the cubic regression will have a higher test RSS because overfitting data in training would include more error than the linear regression.  
+
+c) The cubic regression would have lower train RSS than the linear regression.  Cubic regression has higher flexibility as it follows the data points more closely, and in turn will reduce train RSS.  No matter the true relationship between X and Y, cubic regression will follow the data more closely.
+
+d)  Once again, there is not really enough information to determine whether test RSS for linear regression or cubic regression would be lower.  We do not actually know how far the relationship between X and Y is from linear.  If the relationship is closer to linear than cubic, the linear regression test RSS might be lower than the cubic regression RSS.  On the other hand, if the relationship is closer to cubic than linear, the cubic regression test RSS might be lower than the linear regression RSS.  We do not know what level of fleibility would fit the data the best.  
+
+
