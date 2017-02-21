@@ -30,9 +30,10 @@ polygon(My_bars, col = fill)
 
 mean = mean(Galton$height)
 standard_deviation = sd(Galton$height)
-normal_density = dnorm(Galton$height, mean = mean, sd = standard_deviation)
+x = seq(min(Galton$height), max(Galton$height))
+height = sum(diff(evenly_spaced)*hist_basics$count)
 
-points(normal_density)
+lines(x, height * dnorm(x, mean, standard_deviation))
 
 return(bin_counts)
 }
@@ -63,6 +64,45 @@ myHistogram(Galton$height, "tomato", 10)
 myHistogram(Galton$height, "seashell", 2)
 ```
 ## Task 2
+```{r}
+v = c(rnorm(10, mean = 100, sd = 1))
+
+bw = diff((range(v))/sqrt(length(v)))
+
+kernel = function(x, bw) {
+  dnorm(x, mean = 0, sd = bw)
+}
+
+x_vals = seq(min(v)-4*bw, max(v)+4*bw, length = 200)
+
+Dvals = colSums(outer(v,x_vals, FUN=function(x,y){kernel(x-y, bw)}/length(v)))
+
+plot(x_vals, Dvals)
+
+```
+
+
+## Task 3
+```{r}
+plotdensity = function(v,xlim = NULL){
+  bw = diff((range(v))/sqrt(length(v)))
+
+kernel = function(x, bw) {
+  dnorm(x, mean = 0, sd = bw)
+}
+
+x_vals = seq(min(v)-4*bw, max(v)+4*bw, length = 200)
+
+Dvals = colSums(outer(v,x_vals, FUN=function(x,y){kernel(x-y, bw)}/length(v)))
+
+dframe = data.frame(x_vals,Dvals)
+invisible(dframe)
+}
+
+plot(plotdensity(v))
+
+```
+
 
 ## Test statements
 
