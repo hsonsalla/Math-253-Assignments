@@ -1,8 +1,234 @@
 # In-Class Programming Activity, Day 9
+### *Hannah Sonsalla*
 
-Your work goes here ...
+## Task 1
+Create deck of cards.  The first two digits represent the rank (with 11 for J, 12 for Q, and so on). The last digit represents the suit: 1, 2, 3, 4. For instance, the card 123 is the queen of hearts, since 12 in the first two digits stands for Q and 3 in the last digit stands for hearts.
+```{r}
+poker_deck <- c(outer((10 * 2:14), 1:4, '+'))
+poker_deck
+```
 
+Functions suits and ranks.
+```{r}
+suits = function(cards){
+  return(cards%%10)
+}
 
+ranks = function(cards){
+  return(cards%/%10)
+} 
+
+#Testing suits() and ranks() functions
+#suits(c(123, 134))
+#ranks(c(123, 134))
+```
+
+Test hands:
+```{r}
+#Royal Flush
+test_hand_1 = c(102,122,132,112,142)
+#Straight Flush
+test_hand_2 = c(42,52,72,82,62)
+#Four of a kind
+test_hand_3 = c(42,43,44,41,82)
+#Full house
+test_hand_4 = c(42,83,44,41,82)
+#Flush
+test_hand_5 = c(102,82,42,72,132)
+#Straight
+test_hand_6 = c(102,83,71,93,62)
+#Three of a kind
+test_hand_7 = c(134, 131, 52, 73, 133)
+#Two pair
+test_hand_8 = c(102, 83, 43, 84, 101)
+#Pair
+test_hand_9 = c(54, 72, 141, 102, 53)
+
+#No combo test hands
+test_hand_10 = c(21, 34, 142, 113, 62)
+test_hand_11 = c(91, 124, 33, 54, 102)
+
+```
+
+Royal flush (five cards of the same suit with ranks 10, ace, queen, king, ace):
+```{r}
+is_royal_flush = function(five_cards){
+  card_suits = table(suits(five_cards))
+  min_suit = min(card_suits)
+  max_suit = max(card_suits)
+  card_ranks = ranks(five_cards)
+  
+  ifelse((min(card_ranks) == 10) && max(diff(sort(card_ranks))) == 1 && (min_suit == max_suit), TRUE, FALSE)
+
+}
+
+#Tests for royal_flush
+is_royal_flush(test_hand_1)
+
+#False 
+is_royal_flush(test_hand_10)
+```
+
+Straight flush (five cards of the same suit in consecutive order):
+```{r}
+is_straight_flush = function(five_cards){
+  card_suits = table(suits(five_cards))
+  min_suit = min(card_suits)
+  max_suit = max(card_suits)
+  card_ranks = ranks(five_cards)
+
+  ifelse(min_suit == max_suit && max(diff(sort(card_ranks))) == 1 && is_royal_flush(five_cards) == FALSE, TRUE, FALSE)
+}
+
+# Tests for straight_flush
+is_straight_flush(test_hand_2)
+
+# Not royal flush
+is_straight_flush(test_hand_1)
+
+# False
+is_straight(test_hand_9)
+```
+
+Four of a kind (four cards of the same value):
+```{r}
+is_four_of_a_kind = function(five_cards) {
+  card_ranks = table(ranks(five_cards))
+  ifelse(max(card_ranks) == 4, TRUE, FALSE)
+}
+#Tests for four of a kind
+is_four_of_a_kind(test_hand_3)
+
+#False
+is_four_of_a_kind(test_hand_11)
+```
+
+Full house(Three of a kind and the other two cards forming a pair):
+```{r}
+is_full_house = function(five_cards) {
+  card_ranks = table(ranks(five_cards))
+  ifelse(max(card_ranks) == 3 && min(card_ranks) == 2, TRUE, FALSE)
+}
+
+#Tests for full house
+is_full_house(test_hand_4)
+
+# False
+is_full_house(test_hand_10)
+```
+
+Flush (five cards of the same suit):
+```{r}
+is_flush = function(five_cards){
+  card_suits = table(suits(five_cards))
+  min_suit = min(card_suits)
+  max_suit = max(card_suits)
+  ifelse(min_suit == max_suit && is_royal_flush(five_cards) == FALSE && is_straight_flush(five_cards) == FALSE, TRUE, FALSE)
+}
+
+#Tests for flush
+is_flush(test_hand_5)
+
+# Royal Flush
+is_flush(test_hand_1)
+#Straight Flush
+is_flush(test_hand_2)
+#False
+is_flush(test_hand_11)
+```
+
+Straight (five consecutively numbered cards):
+```{r}
+is_straight = function(five_cards) {
+  card_ranks = ranks(five_cards)
+  ifelse(is_royal_flush(five_cards) == FALSE && is_straight_flush(five_cards) == FALSE && max(diff(sort(card_ranks))) == 1, TRUE, FALSE)
+}
+
+#Tests for straight
+is_straight(test_hand_6)
+
+# Royal Flush
+is_straight(test_hand_1)
+# Straight Flush
+is_straight(test_hand_2)
+# False
+is_straight(test_hand_11)
+```
+
+Three of a kind (three cards same rank):
+```{r}
+is_three_of_a_kind = function(five_cards){
+  card_ranks = table(ranks(five_cards))
+  ifelse(max(card_ranks) == 3 && is_full_house(five_cards) == FALSE, TRUE, FALSE)
+}
+
+# Tests for three of a kind
+is_three_of_a_kind(test_hand_7)
+
+# Royal Flush
+is_three_of_a_kind(test_hand_1)
+# Straight Flush
+is_three_of_a_kind(test_hand_2)
+# Four of a Kind
+is_three_of_a_kind(test_hand_3)
+# Full house
+is_three_of_a_kind(test_hand_4)
+# Flush
+is_three_of_a_kind(test_hand_5)
+# Straight
+is_three_of_a_kind(test_hand_6)
+# False
+is_three_of_a_kind(test_hand_10)
+```
+
+Two pair:
+```{r}
+is_two_pair = function(five_cards){
+  card_ranks = table(ranks(five_cards))
+  ifelse(min(card_ranks) == 1 && max(card_ranks) == 2 && dim(card_ranks) == 3, TRUE, FALSE)
+}
+
+# Tests for two pair
+is_two_pair(test_hand_8)
+
+#False
+is_two_pair(test_hand_11)
+
+```
+
+Pair (two cards of same rank):
+```{r}
+is_pair = function(five_cards) {
+  card_ranks = table(ranks(five_cards))
+  ifelse(max(card_ranks) == 2 && is_two_pair(five_cards) == FALSE && is_three_of_a_kind(five_cards) == FALSE && is_full_house(five_cards) == FALSE && is_four_of_a_kind(five_cards) == FALSE, TRUE, FALSE)
+}
+
+# Tests for pair
+
+#Pair
+is_pair(test_hand_9)
+
+#Four of a kind
+is_pair(test_hand_3)
+#Full house
+is_pair(test_hand_4)
+#Three of a kind
+is_pair(test_hand_7)
+# Two pair
+is_pair(test_hand_8)
+
+# False
+is_pair(test_hand_10)
+```
+
+Before draw function
+```{r}
+before_draw = function(poker_deck) {
+  five_cards <- sample(poker_deck, 5)
+}
+
+before_draw(poker_deck)
+```
 
 ## Test statements
 
