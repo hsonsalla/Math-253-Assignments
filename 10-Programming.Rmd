@@ -1,9 +1,71 @@
 # In-Class Programming Activity, Day 10
 
-Your work goes here ...
+### *Hannah Sonsalla*
+
+```{r}
+library(ISLR)
+data(Default, package = "ISLR")
+```
+
+## Task 1
+Logistic Function
+```{r}
+logistic = function(x) {
+  return(exp(x)/ (1+exp(x)))
+}
+```
 
 
+## Task 2
+Linear Combinations
+```{r}
+linear_combine = function(data, coefs){
+  result <- 0
+  for (nm in names(coefs)) {
+    if (nm == "intercept") {
+      result <- result + coefs[[nm]]
+    } 
+    else if (!nm %in% names(data)) {
+      stop("Variable name in coef vector doesn't exist.")
+    }
+    else {
+      result <- result + coefs[[nm]] * data[[nm]]
+    }
+  }  
+  return (result)
+}
+```
 
+
+##Task 3
+Probabilities
+```{r}
+LL_logistic = function(data, coefs, outcome){
+  ans1 = linear_combine(data, coefs)
+  probs = logistic(ans1)
+  likes = ifelse(outcome==1, probs, 1-probs)
+  sum(log(likes))
+}
+
+#Test - should equal -2425.733
+LL_logistic(data=Default, 
+            coefs = c(intercept = 1, income = -0.0001), 
+            outcome = Default$default == "Yes")
+```
+
+##Task 4
+Optimize
+```{r}
+
+best_coefs <- optim(c(intercept = 1, income = 0.0001), LL_logistic, 
+                    control=list(fnscale = -1), 
+                    data = Default, 
+                    outcome = Default$default == "Yes")
+best_coefs
+glm(default == "Yes" ~ income, data=Default, family="binomial")
+```
+
+Using an intercept of 1 and an income of 0.0001 results for coefs in optim() results in an intercept of -3.094342e+00 and income slope of -8.322106e-06.  When using the glm function, I obtained an intercept of -3.094e+00 and in income slope of -8.353e-06.  The intercepts of both of these are very close.  The slopes differ by about -0.031e-06.  
 ## Test statements
 
 ```{r}
