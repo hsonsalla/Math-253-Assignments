@@ -223,7 +223,7 @@ is_pair(test_hand_10)
 
 Before draw function
 ```{r}
-before_draw = function() {
+before_draw = function(x) {
   five_cards <- sample(poker_deck, 5)
   if(is_royal_flush(five_cards)) {
     return ("royal flush")

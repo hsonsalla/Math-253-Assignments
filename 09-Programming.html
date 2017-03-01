@@ -334,7 +334,7 @@ is_pair(test_hand_8)</code></pre>
 is_pair(test_hand_10)</code></pre>
 <pre><code>## [1] FALSE</code></pre>
 <p>Before draw function</p>
-<pre class="r"><code>before_draw = function() {
+<pre class="r"><code>before_draw = function(x) {
   five_cards &lt;- sample(poker_deck, 5)
   if(is_royal_flush(five_cards)) {
     return (&quot;royal flush&quot;)
@@ -374,11 +374,11 @@ before_draw()</code></pre>
 table(replicate(10000, before_draw()))</code></pre>
 <pre><code>## 
 ##           flush  four of a kind      full house         nothing 
-##              27               3              21            4977 
+##              23               1              13            4971 
 ##            pair        straight  straight flush three of a kind 
-##            4168             114               1             199 
+##            4152             132               1             215 
 ##        two pair 
-##             490</code></pre>
+##             492</code></pre>
 <p>Calculated probabilities (number divided by 10,000): flush - 0.0016, four of a kind - 0.0001, full house - 0.0019, nothing - 0.5038, pair = 0.4188, straight - 0.0112, three of a kind - 0.0179, two pair - 0.0447.</p>
 <p>Here is a break down in percentages: four of a kind - 0.01%, full house - 0.19%, flush - 0.16%, straight - 1.12%, three of a kind 0 1.79%, two pair - 4.47%, one pair - 41.88% and no pair - 50.38%. These values are relatively close to the Wikipedia probabilities.<br />
 ## Test statements</p>
