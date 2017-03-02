@@ -65,7 +65,7 @@ best_coefs
 glm(default == "Yes" ~ income, data=Default, family="binomial")
 ```
 
-Using an intercept of 1 and an income of 0.0001 results for coefs in optim() results in an intercept of -3.094342e+00 and income slope of -8.322106e-06.  When using the glm function, I obtained an intercept of -3.094e+00 and in income slope of -8.353e-06.  The intercepts of both of these are very close.  The slopes differ by about -0.031e-06.  
+Using an intercept of 1 and an income of 0.0001 results for coefs in optim() results in an intercept of -3.094342e+00 and income of -8.322106e-06.  When using the glm function, I obtained an intercept of -3.094e+00 and an income of -8.353e-06.  The intercepts of both of these are very close.  The incomes differ by about 0.031e-06.  
 ## Test statements
 
 ```{r}
