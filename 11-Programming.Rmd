@@ -1,7 +1,57 @@
 # In-Class Programming Activity, Day 11
 
-Your work goes here ...
+### *Hannah Sonsalla*
 
+## Task 1
+Matrices and their inverse
+```{r}
+Sigma = cbind(c(1.0, -0.7), c(-0.7, 1.0))
+Sigma
+Sigma_inv = solve(Sigma)
+Sigma_inv
+test_inverse = Sigma %*% Sigma_inv
+test_inverse
+```
+
+## Task 2
+Matrix Compositions
+```{r}
+A = chol(Sigma)
+A
+t(A)
+# Matrix product of t(A) and A is equivalent to sigma.
+all(abs((t(A) %*% A - Sigma)) < 0.01)
+```
+## Task 3
+Orthogonal vectors and matrices
+```{r}
+x1 = cbind(rnorm(10))
+x1
+x2 = cbind(rnorm(10))
+x2
+X = cbind(x1, x2)
+matrixMultiplicationX = t(X) %*% X
+matrixMultiplicationX
+covarianceMatrixX = matrixMultiplicationX / nrow(X)
+covarianceMatrixX
+
+w1 = cbind(rnorm(10000))
+w2 = cbind(rnorm(10000))
+W = cbind(w1, w2)
+W_cov = (t(W) %*% W) / nrow(W)
+
+```
+
+## Task 4
+Generating correlated random vectors
+```{r}
+A_inv = chol(Sigma_inv)
+Y = W %*% A
+dim(Y)
+covarianceMatrixY = (t(Y) %*% Y) / dim(Y)[1]
+all(abs(covarianceMatrixY - Sigma) < 1/sqrt(10000))
+plot(Y[,1], Y[,2],col = rgb(0, 0, 0, .05))
+```
 
 
 ## Test statements
