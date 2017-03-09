@@ -1,6 +1,37 @@
 # In-Class Programming Activity, Day 12
 
-Your work goes here ...
+### *Hannah Sonsalla*
+
+## Task 1
+```{r}
+n_cases = 100
+
+red_mean = c(1,0)
+green_mean = c(0,-1)
+blue_mean = c(-1, 1)
+
+covar_red = cbind(c(3, -1.7), c(-1.7, 1))
+covar_blue = cbind(c(2, 1.5), c(1.5, 3))
+
+One = cbind(c(rnorm(n_cases, mean = 0, sd = 1)), c(rnorm(n_cases, mean = 0, sd = 1)))
+Two = cbind(c(rnorm(n_cases, mean = 0, sd = 1)), c(rnorm(n_cases, mean = 0, sd = 1)))
+Three = cbind(c(rnorm(n_cases, mean = 0, sd = 1)), c(rnorm(n_cases, mean = 0, sd = 1)))
+
+Red = One %*% chol(covar_red)
+Green = Two %*% chol(covar_red)
+Blue = Three %*% chol(covar_blue)
+
+Red = outer(c(Red), red_mean, FUN = "+")
+Blue = outer(blue_mean, c(Blue), FUN = "+")
+Green = outer(green_mean, c(Green), FUN = "+")
+
+Red = data.frame(x = Red[,1], y = Red[,2], class = "red", stringsAsFactors = FALSE)
+Blue = data.frame(x = Blue[,1], y = Blue[,2], class = "blue", stringsAsFactors = FALSE)
+Green = data.frame(x = Green[,1], y = Green[,2], class = "green", stringsAsFactors = FALSE)
+
+Same_sigma <- rbind(Red, Green)
+Different_sigma <- rbind(Red, Blue)
+```
 
 
 
