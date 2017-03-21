@@ -1,0 +1,67 @@
+# In-Class Programming Activity 3/9 KNN
+
+### *Hannah Sonsalla*
+
+## Task 1
+```{r}
+Temp = read.csv("http://tiny.cc/dcf/Temperature.csv", stringsAsFactors = FALSE)
+```
+
+```{r}
+knn = function(form ,data, k=1){
+  # explanatory variables
+  M = model.matrix(form, data)
+  yname = form[[2]]
+  #response variables
+  response = eval(yname, envir = data)
+  
+  # Important knn-related stuff
+  result = list(M=M, response = response, k=k, formula = form)
+  
+  # return the model as an object of class "knn"
+  class(result) = "knn"
+  return(result)
+}
+
+#knn(Y ~ X1 * X2, data = head(Temp))
+
+
+predict.knn = function(mod, newdata = NULL){
+  if(is.null(newdata)) stop("I need data inputs!!!")
+  newM = model.matrix(mod$formula, data = newdata)
+  
+  sofar = NULL
+  for(k in 1:nrow(newM)){
+  one_row = newM[1,]
+  this_point = matrix(one_row, 
+                      nrow = nrow(mod$M), 
+                      ncol = length(one_row),
+                      byrow = TRUE)
+  
+  distances = rowSums((mod$M - this_point)^2)
+  best_indices = order(distances)[1:mod$k]
+  result = table(mod$response[best_indices])/mod$k
+  sofar = rbind(sofar, result)
+  }
+  return(sofar)
+}
+
+my_mod = knn(Y ~ X1 + X2, data = head(Temp), k = 3)
+#predict(my_mod, newdata = mtcars)
+predict(my_mod, newdata = tail(Temp))
+```
+
+```{r}
+f= y ~ X1 + X2 + whatever
+class(f)
+
+f[[1]]
+f[[2]]
+class(f[[2]])
+#name - refers to an object
+
+f = sqrt(y) ~ x + z
+f[[2]]
+
+```
+
