@@ -143,9 +143,12 @@ Red = One %*% chol(covar_red)
 Green = Two %*% chol(covar_red)
 Blue = Three %*% chol(covar_blue)
 
-Red = outer(c(Red), red_mean, FUN = &quot;+&quot;)
-Blue = outer(blue_mean, c(Blue), FUN = &quot;+&quot;)
-Green = outer(green_mean, c(Green), FUN = &quot;+&quot;)
+Red = Red + matrix(red_mean, ncol = ncol(Red), nrow = nrow(Red), byrow = TRUE)
+Blue = Blue + matrix(blue_mean, ncol = ncol(Blue), nrow = nrow(Blue), byrow = TRUE)
+Green = Green + matrix(green_mean, ncol = ncol(Green), nrow = nrow(Green), byrow = TRUE)
+#Red = outer(c(Red), red_mean, FUN = &quot;+&quot;)
+#Blue = outer(blue_mean, c(Blue), FUN = &quot;+&quot;)
+#Green = outer(green_mean, c(Green), FUN = &quot;+&quot;)
 
 Red = data.frame(x = Red[,1], y = Red[,2], class = &quot;red&quot;, stringsAsFactors = FALSE)
 Blue = data.frame(x = Blue[,1], y = Blue[,2], class = &quot;blue&quot;, stringsAsFactors = FALSE)
@@ -153,6 +156,22 @@ Green = data.frame(x = Green[,1], y = Green[,2], class = &quot;green&quot;, stri
 
 Same_sigma &lt;- rbind(Red, Green)
 Different_sigma &lt;- rbind(Red, Blue)</code></pre>
+</div>
+<div id="task-2" class="section level2">
+<h2>Task 2</h2>
+<p>LDA &amp; QDA</p>
+<pre class="r"><code>library(MASS)
+mod_LDA_one &lt;- lda(class ~ x + y, data = Same_sigma)
+mod_LDA_two &lt;- lda(class ~ x + y, data = Different_sigma)
+
+test_LDA_one &lt;- predict(mod_LDA_one, newdata = Same_sigma)
+test_LDA_two &lt;- predict(mod_LDA_one, newdata = Different_sigma)
+
+mod_QDA_one &lt;- qda(class ~ x + y, data = Same_sigma)
+mod_QDA_two &lt;- qda(class ~ x + y, data = Different_sigma)
+
+test_QDA_one &lt;- predict(mod_QDA_one, newdata = Same_sigma)
+test_QDA_two &lt;- predict(mod_QDA_one, newdata = Different_sigma)</code></pre>
 </div>
 <div id="test-statements" class="section level2">
 <h2>Test statements</h2>
@@ -166,11 +185,11 @@ Different_sigma &lt;- rbind(Red, Blue)</code></pre>
 ## passed: all(names(Red) %in% c(&quot;x&quot;, &quot;y&quot;, &quot;class&quot;))
 ## passed: all(abs(apply(Red[, c(1, 2)], FUN = mean, MARGIN = 2) - red_mean) &lt; 
 ##     0.5)
-## FAILED: all(table(Same_sigma$class) == c(n_cases, n_cases))
-## FAILED: object &quot;mod_LDA_one&quot; doesn't exist.
-## FAILED: object &quot;mod_QDA_two&quot; doesn't exist.
-## FAILED: object &quot;test_QDA_one&quot; doesn't exist.
-## FAILED: object &quot;test_LDA_two&quot; doesn't exist.</code></pre>
+## passed: all(table(Same_sigma$class) == c(n_cases, n_cases))
+## passed: object &quot;mod_LDA_one&quot; exists
+## passed: object &quot;mod_QDA_two&quot; exists
+## passed: object &quot;test_QDA_one&quot; exists
+## passed: object &quot;test_LDA_two&quot; exists</code></pre>
 </div>
 </div>
 
