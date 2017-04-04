@@ -1,6 +1,45 @@
 # In-Class Programming Activity, Day 14
 
-Your work goes here ...
+### Hannah Sonsalla
+
+### Load data
+```{r}
+library(glmnet)
+GenCont <- read.csv("http://tiny.cc/dcf/GenCont.csv")
+```
+
+## Task 1
+```{r}
+compare_ols_ridge <- function(responses, predictors, lambda=1){
+  inds = sample(1:nrow(GenCont), size = nrow(GenCont)/2 )
+  Train = predictors[inds,]
+  Test = predictors[-inds,]
+  
+  lm.fit = lm(responses[inds] ~ as.matrix(Train))
+
+  ridgeRegression <- glmnet(as.matrix(Train), responses[inds], alpha = 0)
+  
+  preds_in = predict(lm.fit, newdata = Train)
+  preds_out = predict(ridgeRegression, newdata = Test)
+  
+  glm_in = predict.glmnet(ridgeRegression, newx = Train)
+  glm_out = predict.glmnet(ridgeRegression, newx = Test)
+  
+  ols_in = mean(preds_in ~ responses[inds]^2)
+  ols_out = mean(preds_out ~ responses[inds]^2)
+  
+  glm_ols_in = mean(glm_in ~ response[inds]^2)
+  glm_ols_out = mean(glm_out ~ response[inds]^2)
+  
+  list(lambda, ols_in = ols_in, ols_out = ols_out, glm_in = glm_in, glm_out = glm_out)
+
+}
+
+
+Shrink_results = compare_ols_ridge(GenCont$Phenotypes, GenCont[,-1])
+```
+
+
 
 
 
