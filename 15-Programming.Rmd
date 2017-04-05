@@ -1,7 +1,86 @@
 # In-Class Programming Activity, Day 15
 
-Your work goes here ...
+### Hannah Sonsalla
+Download & load Mona
+```{r}
+#download.file("http://tiny.cc/dcf/mona.rda", destfile = "mona.rda")
+load("mona.rda")
+```
 
+## Task 1 - Overview
+```{r}
+X <- t(mona) - mean(mona[])
+dim(X)
+X_rand = matrix(rnorm(nrow(mona)*ncol(mona), mean = 0, sd = 1), ncol(mona), nrow(mona))
+dim(X_rand)
+X_corr = X_rand %*% chol(var(X))
+dim(X_corr)
+```
+
+## Task 2 - Sparse beta
+```{r}
+beta = rep(0, 191)
+sample_beta = sample(1:191, 16, replace = FALSE)
+
+for (i in 1:16) {
+  rand_num = sample(c(2, 5, -3, -4), 1)
+  beta[sample_beta[i]] = rand_num
+}
+beta
+```
+
+## Task 3 - Output
+```{r}
+Y_pure = X %*% beta
+var_Y_pure = var(Y_pure)
+Y_real = X %*% beta + rnorm(nrow(X), mean = 0, sd = sqrt(0.1 * var_Y_pure))
+```
+
+## Task 4 - Least Squares
+```{r}
+beta_hat_pure = coef(lm(Y_pure ~ X))
+plot(beta_hat_pure[-1] ~ beta)
+```
+
+```{r}
+beta_hat_real = coef(lm(Y_real ~ X))
+plot(beta_hat_real[-1], beta)
+```
+Yes, we would be able to detect that beta is sparse because most of the data appears in a line.
+
+## Task 4 - Lasso Estimator
+```{r}
+library(glmnet)
+lasso_mod <- cv.glmnet(X, Y_real, alpha=1)
+beta_lasso <- predict(lasso_mod, type = "coefficients", s = lasso_mod$lambda.min)
+```
+
+## Task 5 - Principal Components
+```{r}
+sing_vals_X = svd(X)$d
+r_squared_X = (cumsum(sing_vals_X^2)) / (sum(sing_vals_X^2)) 
+sing_vals_X_rand = svd(X_rand)$d
+r_squared_X_rand = (cumsum(sing_vals_X_rand^2)) / (sum(sing_vals_X_rand^2)) 
+sing_vals_X_corr = svd(X_corr)$d
+r_squared_X_corr = (cumsum(sing_vals_X_corr^2)) / (sum(sing_vals_X_corr^2)) 
+
+# Counts how many principal components necessary to reconstruct matrix with R^2 of 0.99%.
+n99 = which(r_squared_X > 0.99)[[1]]
+n99_rand = which(r_squared_X_rand > 0.99)[[1]]
+n99_corr = which(r_squared_X_corr > 0.99)[[1]]
+
+```
+
+
+## Task 6 - Cross Validated R^2 function
+```{r}
+library(pls)
+pcr.fit <- pcr(Y_real ~ X, scale = TRUE, validation="CV") 
+r_squared_pcr.fit = R2(pcr.fit)
+r_squared_pcr.fit
+```
+
+It appears that there are around 16 - 25 components necessary to get an r-squared of 0.85.
 
 
 ## Test statements
