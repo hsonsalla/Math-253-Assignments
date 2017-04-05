@@ -20,23 +20,24 @@ compare_ols_ridge <- function(responses, predictors, lambda=1){
   ridgeRegression <- glmnet(as.matrix(Train), responses[inds], alpha = 0)
   
   preds_in = predict(lm.fit, newdata = Train)
-  preds_out = predict(ridgeRegression, newdata = Test)
+  preds_out = predict(lm.fit, newdata = Test)
+
+  preds_glm_in = predict.glmnet(ridgeRegression, newx = as.matrix(Train))
+  preds_glm_out = predict.glmnet(ridgeRegression, newx = as.matrix(Test))
   
-  glm_in = predict.glmnet(ridgeRegression, newx = Train)
-  glm_out = predict.glmnet(ridgeRegression, newx = Test)
+  ols_in = mean((preds_in - responses[inds])^2)
+  ols_out = mean((preds_out - responses[-inds])^2)
   
-  ols_in = mean(preds_in ~ responses[inds]^2)
-  ols_out = mean(preds_out ~ responses[inds]^2)
+  ridge_in = mean((preds_glm_in - responses[inds])^2)
+  ridge_out = mean((preds_glm_out - responses[-inds])^2)
   
-  glm_ols_in = mean(glm_in ~ response[inds]^2)
-  glm_ols_out = mean(glm_out ~ response[inds]^2)
-  
-  list(lambda, ols_in = ols_in, ols_out = ols_out, glm_in = glm_in, glm_out = glm_out)
+  list(lambda = lambda, ols_in = ols_in, ols_out = ols_out, ridge_in = ridge_in, ridge_out = ridge_out)
 
 }
 
 
 Shrink_results = compare_ols_ridge(GenCont$Phenotypes, GenCont[,-1])
+Shrink_results
 ```
 
 
