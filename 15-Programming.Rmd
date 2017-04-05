@@ -38,14 +38,15 @@ Y_real = X %*% beta + rnorm(nrow(X), mean = 0, sd = sqrt(0.1 * var_Y_pure))
 
 ## Task 4 - Least Squares
 ```{r}
-beta_hat_pure = coef(lm(Y_pure ~ X))
-plot(beta_hat_pure[-1] ~ beta)
+beta_hat_pure = coef(lm(Y_pure ~ X-1))
+plot(beta_hat_pure ~ beta)
 ```
 
 ```{r}
-beta_hat_real = coef(lm(Y_real ~ X))
-plot(beta_hat_real[-1], beta)
+beta_hat_real = coef(lm(Y_real ~ X-1))
+plot(beta_hat_real, beta)
 ```
+
 Yes, we would be able to detect that beta is sparse because most of the data appears in a line.
 
 ## Task 4 - Lasso Estimator
@@ -77,7 +78,7 @@ n99_corr = which(r_squared_X_corr > 0.99)[[1]]
 library(pls)
 pcr.fit <- pcr(Y_real ~ X, scale = TRUE, validation="CV") 
 r_squared_pcr.fit = R2(pcr.fit)
-r_squared_pcr.fit
+plot(r_squared_pcr.fit)
 ```
 
 It appears that there are around 16 - 25 components necessary to get an r-squared of 0.85.
