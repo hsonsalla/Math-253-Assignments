@@ -38,6 +38,9 @@ compare_ols_ridge <- function(responses, predictors, lambda=1){
 
 Shrink_results = compare_ols_ridge(GenCont$Phenotypes, GenCont[,-1])
 Shrink_results
+
+
+Shrink_results = compare_ols_ridge(GenCont$Phenotypes, GenCont[,-1])
 ```
 
 
