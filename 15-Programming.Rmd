@@ -65,6 +65,10 @@ r_squared_X_rand = (cumsum(sing_vals_X_rand^2)) / (sum(sing_vals_X_rand^2))
 sing_vals_X_corr = svd(X_corr)$d
 r_squared_X_corr = (cumsum(sing_vals_X_corr^2)) / (sum(sing_vals_X_corr^2)) 
 
+plot(r_squared_X, col = "red")
+points(r_squared_X_rand, col="blue")
+lines(r_squared_X_corr, col = "green")
+
 # Counts how many principal components necessary to reconstruct matrix with R^2 of 0.99%.
 n99 = which(r_squared_X > 0.99)[[1]]
 n99_rand = which(r_squared_X_rand > 0.99)[[1]]
