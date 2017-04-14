@@ -1,2 +1,5 @@
 # Topic 5 Exercises: Cross-Validation
 
+### Hannah Sonsalla
+
+### I finished the in-class programming activities for the first five topics as the assignment for this topic.
