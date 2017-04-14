@@ -1,2 +1,180 @@
 # Topic 6 Exercises: Selecting Model Terms
 
+### Hannah Sonsalla
+
+## Theory Assignment
+### 6.8.1
+We perform best subset, forward stepwise and backward stepwise selection on a single data set.  For each appraoch, we obtain p+1 models, containing 0, 1, 2, ... ,p predictors.  Explain your answers:
+
+a)  Which of the three models with k predictors has the smallest training RSS?
+
+The best subset model with k predictors would have the smallest training RSS.  The best subset model takes into account all possible models containing p choose k predictors and selects the best model out of those (by means of smallest RSS).  Thus, it is bound to have the smallest training RSS.  Foward stepwise selection model with k predictors is chosen by considering p-k models that augment the predictors of M[k-1] with one additional predictor.  Backward stepwise selection model with k predictors is chosen from k models that that contain all but one of the predictors in M[k+1].  Forward stepwise and backward stepwise selection both consider a subset of all possible models with k predictors, which means there is a greater chance that the training RSS in these models is higher than in best subset.    
+
+b)  Which of the three models with k predictors has the smallest test RSS?
+
+Best subset selection might have the smallest test RSS due to the fact that it takes into consideration more models than both forward stepwise and backward stepwise selection.  On the other hand, forward stepwise and backward stepwise selection could pick a model with a smaller test RSS by chance.  However, this is not guaranteed.  
+
+c)  True or false
+
+i: True.  The model with k + 1 predictors is formed by augmenting the predictors in the model with k predictors plus one additional predictor.
+
+ii:  True.  The model with k predictors is formed by removing one predictor from the model with k + 1 predictors.
+
+iii:  False. There is no straightforward link or relationship between the models obtained from forward and backward stepwise selection.
+
+iv:  False. There is no straightforward link or relationship between the models obtained from forward and backward stepwise selection.
+
+v: False.  The model with k + 1 predictors is formed by selecting from all possible models with k + 1 predictors.  It will not necessarily have all of the predictors that were selected for the model with k predictors.  
+
+### 6.8.2
+a) The lasso, relative to least squares is:
+iii. is correct
+The lasso is less flexible and will give improved prediction accuracy when its increase in bias is less than its decrease in variance.  It is a more restrictive model.  As long as the model does not have too high of a bias from adding predictors, it will perform better than least squares which may be fitting to irrelevant variables.   
+
+b) The ridge regression, relative to least squares is:
+iii. is correct
+Ridge regression is less flexible and will give improved prediction accuracy when its increase in bias is less than its decrease in variance.  It is similar to the lasso, but slightly less restrictive.
+
+c)  Non-linear mothods, relative to least squares are:
+ii. is correct
+Non-linear methods are more flexible and will give improved prediction accuracy when their increase in variance are less than their decrease in bias.  Non-linear methods will have more variance from the increase in sensitivity of fitting data.  To perform well, they will need to have a drop in bias.
+
+## Applied Assignment
+
+### 6.8.9
+Predict number of applications recieved using the other variables in the College data set.
+
+```{r}
+# Load library
+library(ISLR)
+data(College)
+```
+
+a) Split data into training set and test set.
+```{r}
+set.seed(11)
+
+#train = sample(c(TRUE, FALSE), nrow(College), rep = TRUE)
+#test = (!train)
+
+train = sample(1:dim(College)[1], dim(College)[1] / 2)
+test = (-train)
+College.train = College[train, ]
+College.test = College[test, ]
+```
+
+b) Fit a linear model using least squares on training set, and report test error obtained.
+```{r}
+lm.fit= lm(Apps ~ ., data = College.train)
+lm.pred = predict(lm.fit, College.test)
+mean((lm.pred - College.test$Apps)^2)
+```
+
+Thus, the test MSE is 1.538442 * 10^6 for least squares.
+
+c) Fit a ridge regression model on training set, with lambda chosen by cross-validation.  Report test error obtained.
+```{r}
+library(glmnet)
+train.mat = model.matrix(Apps ~ ., data = College.train)
+test.mat = model.matrix(Apps ~ ., data = College.test)
+grid = 10 ^ seq(4, -2, length = 100)
+ridge.mod = glmnet(train.mat, College.train$Apps, alpha = 0, lambda = grid, thresh = 1e-12)
+
+# Choose lambda by cross validation
+ridge.cv = cv.glmnet(train.mat, College.train$Apps, alpha = 0, lambda = grid, thresh = 1e-12)
+bestlam.ridge = ridge.cv$lambda.min
+bestlam.ridge
+
+# test MSE associated with value of lambda
+ridge.pred = predict(ridge.mod, s = bestlam.ridge, newx = test.mat)
+mean((ridge.pred - College.test$Apps)^2)
+```
+
+The value of lambda that results in the smallest cross-validation error is 18.73817.  The test MSE for ridge regression is 1.608859* 10^6 which is higher than that for least squares.
+
+d) Fit a lasso model on training set, with lambda chosen by cross-validation.  Report test error obtained, along with the number of non-zero coefficient estimates.
+
+```{r}
+lasso.mod = glmnet(train.mat, College.train$Apps, alpha = 1, lambda = grid, thresh = 1e-12)
+
+# Choose lambda by cross-validation
+lasso.cv = cv.glmnet(train.mat, College.train$Apps, alpha = 1, lambda = grid, thresh = 1e-12)
+bestlam.lasso = lasso.cv$lambda.min
+bestlam.lasso
+
+# test MSE associated with value of lambda
+lasso.pred = predict(lasso.mod, s = bestlam.lasso, newx = test.mat)
+mean((lasso.pred - College.test$Apps)^2)
+```
+
+The value of lambda that results in the smallest cross-validation error is 21.54435.  The test MSE for ridge regression is 1.635280 * 10^6 which is higher than that for least squares.
+
+Non-zero coefficient estimates:
+```{r}
+lasso.out = glmnet(model.matrix(Apps~., data=College),College$Apps, alpha=1, lambda = grid)
+lasso.coef = predict(lasso.out, s=bestlam.lasso, type="coefficients")[1:19,]
+lasso.coef
+```
+
+Non-zero coefficients include those for PrivateYes, Accept, Enroll, Top10perc, Top25perc, P.undergrad, Outstate, Room.Board, PhD, Terminal, S.F.Ratio, perc.alumni, Expend and Grad.Rate variables.  Thus, exactly 3 of the 17 coefficient estimates are exactly zero.
+
+e) Fit a PCR model on the training set, with M chosen by cross-validation.  Report test error obtained, along with the value of M selected by cross-validation.
+
+Principal Components Regression
+
+```{r}
+library(pls)
+pcr.fit = pcr(Apps ~ ., data = College, scale = TRUE, validation = "CV")
+validationplot(pcr.fit, val.type = "MSEP")
+```
+
+Perform PCR on training data and evaluate test set performance.
+```{r}
+pcr.fit = pcr(Apps ~ ., data = College.train, scale = TRUE, validation = "CV")
+validationplot(pcr.fit, val.type = "MSEP")
+```
+
+Tthe lowest cross-validation error occurs when M = 10 components are used.  
+Compute test MSE:
+```{r}
+pcr.pred <- predict(pcr.fit, College.test, ncomp = 10)
+mean((pcr.pred - College.test$Apps)^2)
+```
+
+The test MSE for principal components regression is  3.014496 * 10^6 which is also higher than least squares.
+
+f) Fit a PLS model on the training set, with M chosen by cross-validation.  Report test error obtained, along with the value of M selected by cross-validation.
+
+```{r}
+pls.fit <- plsr(Apps ~ ., data = College.train, scale = TRUE, validation = "CV")
+validationplot(pls.fit, val.type = "MSEP")
+```
+
+The lowest cross-validation error occurs when M = 10 partial least squares directions are used.  
+
+```{r}
+pls.pred = predict(pls.fit, College.test, ncomp = 10)
+mean((pls.pred - College.test$Apps)^2)
+```
+
+The test MSE for partial least squares is 1.508987 * 10^6.  This is the lowest test MSE out of all of the models, even least squares.
+
+g) Comment on the results obtained.  How accurately can we predict the number of college applications recieved?  Is there much difference among the test errors resulting from these five approaches?
+
+I will compute R-squared for each of the above models.
+```{r}
+test.avg = mean(College.test$Apps)
+lm.r2 = 1 - mean((lm.pred - College.test$Apps)^2) / mean((test.avg - College.test$Apps)^2)
+ridge.r2 = 1 - mean((ridge.pred - College.test$Apps)^2) / mean((test.avg - College.test$Apps)^2)
+lasso.r2 = 1 - mean((lasso.pred - College.test$Apps)^2) / mean((test.avg - College.test$Apps)^2)
+pcr.r2 = 1 - mean((pcr.pred - College.test$Apps)^2) / mean((test.avg - College.test$Apps)^2)
+pls.r2 = 1 - mean((pls.pred - College.test$Apps)^2) / mean((test.avg - College.test$Apps)^2)
+lm.r2
+ridge.r2
+lasso.r2
+pcr.r2
+pls.r2
+barplot(c(lm.r2, ridge.r2, lasso.r2, pcr.r2, pls.r2), col="blue")
+```
+
+I found that the test R-squared for least squares is 0.9044281, for ridge regression is 0.9000536, for lasso is 0.8984123, for pcr is 0.8127319 and for pls is 0.9062579.  The results for least squares, ridge regression and lasso are very comparable.  Lasso reduces the variables “F. Undergrade”, “Books” and "Personal" to zero and shrinks coefficients of other variables.  The plot shows the R-squared values for all models.  PCR has the smallest R-squared.  With the exception of PCR, all models predict college applications with high accuracy.
