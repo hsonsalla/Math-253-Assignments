@@ -1,2 +1,6 @@
 # Topic 3 Exercises: Likelihood
 
+### Hannah Sonsalla
+
+### I finished the exponential likelihood and taxicab in-class activities since there are no exercises from the textbook for this topic.
+
