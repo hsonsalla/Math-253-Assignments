@@ -7,7 +7,7 @@
 my_knots = function(x,k){
   qs = (1:k)/(1+k)
   #qs = seq(1/(k+1), 0.9999, by = 1/(k+1))
-  quantile(rnorm(1000), probs=qs)
+  quantile(x, probs=qs)
 }
 
 my_knots(rnorm(1000), 2)
@@ -19,7 +19,8 @@ my_knots(rnorm(1000), 2)
 spline_model_matrix = function(x, knot_locations){
   MM <- cbind(1, x, x^2, x^3)
   for (knot in knot_locations){
-    new_vector = (x-knot_locations[knot])^3
+    new_vector = (x-knot)^3
+    new_vector = ifelse(new_vector > 0, new_vector, 0)
     MM <- cbind(MM, new_vector)
   }
   return (MM)
@@ -36,6 +37,10 @@ fit_spline <- function(formula, k=2, data=parent.frame()) {
   MM <- spline_model_matrix(x, knot_locations)
   mod <- lm(y ~ MM - 1)
   res <- list(coef = coef(mod), knots = knot_locations, cov = vcov(mod))
+  # Modified to include RSE
+  residual_degree_freedom = length(x) - ncol(MM)
+  residuals = mod$residuals
+  rse = sum(residuals^2) / residual_degree_freedom
   class(res) <- "my_spline"
   
   return(res)
@@ -52,12 +57,87 @@ predict.my_spline <-
   MM <- spline_model_matrix(newx, mod$knots)
   vals <- MM %*% mod$coef
   se <- sqrt(rowSums(MM %*% mod$cov * MM))
-  if (intervals == "none") return(vals)
-  else return(NULL) # for future use
+  rse = mod$rse
+    if (intervals == "confidence") return(data.frame(upper = vals + 2* se, vals = vals, lower=vals - 2 * se))
+  else if (intervals == "prediction") return(data.frame(upper = vals + 2 * sqrt(se^2 + rse^2), vals = vals, lower = vals - 2 * sqrt(se^2 + rse^2)))
+  else return(vals) # for future use
 }
 ```
 
+Try function on Wage data from the ISLR package, finding a smooth model of wage versus age.  Tried with 4 knots.  
+```{r}
+library(ISLR)
+data(Wage)
+my_spline = fit_spline(wage~age, k=4, data = Wage)
+num_seq = seq(20,80, length = 200)
+y = predict(my_spline, newx = num_seq)
+plot(num_seq,y, type = "l")
+```
 
+```{r}
+#Confindence interval
+confin_interval = predict(my_spline, newx = num_seq, intervals = "confidence")
+plot(num_seq, confin_interval$vals, col = "black", type = "l", ylim = c(60, 125))
+lines(num_seq, confin_interval$upper, col = "blue", lty = "dashed")
+lines(num_seq, confin_interval$lower, col = "red", lty = "dashed")
+```
+
+```{r}
+# Prediciton interval - need help
+#predict_interval = predict(my_spline, newx = num_seq, intervals = "predict")
+#plot(num_seq, predict_interval$vals, col = "black", type = "l", ylim = c(60, 125))
+#lines(num_seq, predict_interval$upper, col = "blue")
+#lines(num_seq, predict_interval$lower, col = "red")
+```
+
+Examine number of knots.
+```{r}
+num_seq = seq(20,80, length = 200)
+
+my_spline1 = fit_spline(wage~age, k=2, data = Wage)
+y1 = predict(my_spline1, newx = num_seq)
+
+my_spline2 = fit_spline(wage~age, k=5, data = Wage)
+y2 = predict(my_spline2, newx = num_seq)
+
+my_spline3 = fit_spline(wage~age, k=8, data = Wage)
+y3 = predict(my_spline3, newx = num_seq)
+
+my_spline4 = fit_spline(wage~age, k=20, data = Wage)
+y4 = predict(my_spline4, newx = num_seq)
+
+par(mfrow=c(2,2))
+plot(num_seq,y1, type = "l")
+plot(num_seq,y2, type = "l")
+plot(num_seq,y3, type = "l")
+plot(num_seq,y4, type = "l")
+```
+
+Divide Wage into training and testing sets. Find the number of knots that minimizes the mean square error on the testing set.
+```{r}
+train = sample(1:dim(Wage)[1], dim(Wage)[1] / 2)
+test = (-train)
+Wage.train = Wage[train, ]
+Wage.test = Wage[test, ]
+
+library(splines)
+# Using 3 knots
+fit = lm(wage~bs(age, df = 6), data = Wage.train)
+pred = predict(fit, Wage.test)
+mean((pred - Wage.test$age)^2)
+
+# Using 7 knots
+fit2 = lm(wage~bs(age, df = 10), data = Wage.train)
+pred2 = predict(fit2, Wage.test)
+mean((pred2 - Wage.test$age)^2)
+
+# Using 12 knots
+fit2 = lm(wage~bs(age, df = 15), data = Wage.train)
+pred2 = predict(fit2, Wage.test)
+mean((pred2 - Wage.test$age)^2)
+
+
+```
 ## Test statements
 Note: These are the wrong tests for this activity.
 ```{r}
