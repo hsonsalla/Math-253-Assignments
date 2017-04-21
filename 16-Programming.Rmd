@@ -10,8 +10,6 @@ my_knots = function(x,k){
   quantile(x, probs=qs)
 }
 
-my_knots(rnorm(1000), 2)
-
 ```
 
 ## Task 2 - The Basis Set
@@ -36,11 +34,11 @@ fit_spline <- function(formula, k=2, data=parent.frame()) {
   knot_locations <- my_knots(x, k)
   MM <- spline_model_matrix(x, knot_locations)
   mod <- lm(y ~ MM - 1)
-  res <- list(coef = coef(mod), knots = knot_locations, cov = vcov(mod))
   # Modified to include RSE
-  residual_degree_freedom = length(x) - ncol(MM)
+  residual_degree_freedom = nrow(data) - ncol(MM)
   residuals = mod$residuals
   rse = sum(residuals^2) / residual_degree_freedom
+  res <- list(coef = coef(mod), knots = knot_locations, cov = vcov(mod), rse = rse)
   class(res) <- "my_spline"
   
   return(res)
@@ -84,10 +82,7 @@ lines(num_seq, confin_interval$lower, col = "red", lty = "dashed")
 
 ```{r}
 # Prediciton interval - need help
-#predict_interval = predict(my_spline, newx = num_seq, intervals = "predict")
-#plot(num_seq, predict_interval$vals, col = "black", type = "l", ylim = c(60, 125))
-#lines(num_seq, predict_interval$upper, col = "blue")
-#lines(num_seq, predict_interval$lower, col = "red")
+predict_interval = predict(my_spline, newx = num_seq, intervals = "predict")
 ```
 
 Examine number of knots.
@@ -115,29 +110,30 @@ plot(num_seq,y4, type = "l")
 
 Divide Wage into training and testing sets. Find the number of knots that minimizes the mean square error on the testing set.
 ```{r}
+set.seed(1)
 train = sample(1:dim(Wage)[1], dim(Wage)[1] / 2)
 test = (-train)
 Wage.train = Wage[train, ]
 Wage.test = Wage[test, ]
 
-library(splines)
 # Using 3 knots
-fit = lm(wage~bs(age, df = 6), data = Wage.train)
-pred = predict(fit, Wage.test)
+my_spline1 = fit_spline(wage~age, k=3, data = Wage.train)
+pred = predict(my_spline1, newx = Wage.test$age)
 mean((pred - Wage.test$age)^2)
 
-# Using 7 knots
-fit2 = lm(wage~bs(age, df = 10), data = Wage.train)
-pred2 = predict(fit2, Wage.test)
+# Using 10 knots
+my_spline2 = fit_spline(wage~age, k=10, data= Wage.train)
+pred2 = predict(my_spline2, newx = Wage.test$age)
 mean((pred2 - Wage.test$age)^2)
 
-# Using 12 knots
-fit2 = lm(wage~bs(age, df = 15), data = Wage.train)
-pred2 = predict(fit2, Wage.test)
-mean((pred2 - Wage.test$age)^2)
-
-
+# Using 25 knots
+my_spline3 = fit_spline(wage~age, k=25, data = Wage.train)
+pred3 = predict(my_spline3, newx = Wage.test$age)
+mean((pred3 - Wage.test$age)^2)
 ```
+
+To test this, I used 3 knots, 10 knots and 25 knots.  I found that 3 knots performed the best with the lowest MSE of 4863.558.
+
 ## Test statements
 Note: These are the wrong tests for this activity.
 ```{r}
